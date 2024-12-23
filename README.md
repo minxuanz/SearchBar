@@ -1,3 +1,5 @@
-## shortcut keys: ctrl+shift+F
+# shortcut keys
+  Ctrl+Shift+F
 
-## only support google;bing;baidu;duckduckgo
+# only support now
+  google;bing;baidu;duckduckgo
