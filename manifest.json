@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Custom Search Box",
+  "name": "Simple Search Bar",
   "version": "1.0",
-  "description": "A simple Google search box overlay.",
+  "description": "A simple Google search bar overlay.",
   "permissions": ["activeTab", "scripting"],
   "host_permissions": ["https://*/*"],
   "background": {
@@ -13,7 +13,7 @@
       "suggested_key": {
         "default": "Ctrl+Shift+F"
       },
-      "description": "Open search box"
+      "description": "Open search bar"
     }
   },
   "action": {
