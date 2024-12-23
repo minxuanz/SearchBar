@@ -5,10 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const downIcon = document.getElementById("down-icon");
 
   const engines = [
-    { name: 'Google', url: 'https://www.google.com/search?q=', icon: 'google.png', alt: 'G' },
-    { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: 'bing.png', alt: 'B' },
-    { name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'baidu.png', alt: 'BA' },
-    { name: 'Duckduckgo', url: 'https://www.duckduckgo.com/?q=', icon: 'duckduckgo.png', alt: 'D' },
+    { name: 'Google', url: 'https://www.google.com/search?q=', icon: 'icons/google.png', alt: 'G' },
+    { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: 'icons/bing.png', alt: 'B' },
+    { name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'icons/baidu.png', alt: 'BA' },
+    { name: 'Duckduckgo', url: 'https://www.duckduckgo.com/?q=', icon: 'icons/duckduckgo.png', alt: 'D' },
   ];
 
   // Load current engine index from localStorage or default to 0

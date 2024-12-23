@@ -2,4 +2,10 @@
   Ctrl+Shift+F
 
 # only support now
-  google;bing;baidu;duckduckgo
+ - google
+
+ - bing
+
+ - baidu
+
+ - duckduckgo

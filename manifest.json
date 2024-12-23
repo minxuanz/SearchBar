@@ -18,5 +18,10 @@
   },
   "action": {
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "hello.png",
+    "48": "hello.png",
+    "128": "hello.png"
   }
 }
