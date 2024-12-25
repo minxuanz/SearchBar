@@ -20,8 +20,8 @@
     "default_popup": "popup.html"
   },
   "icons": {
-    "16": "hello.png",
-    "48": "hello.png",
-    "128": "hello.png"
+    "16": "ttt.png",
+    "48": "ttt.png",
+    "128": "ttt.png"
   }
 }
