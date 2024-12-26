@@ -65,16 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
         engineIcon.src = engine.icon;
         engineIcon.alt = engine.name;
         
-        // 创建删除按钮（仅对自定义引擎显示）
-        const removeIcon = document.createElement('div');
-        removeIcon.className = 'remove-icon';
-        
-        if (index >= engines.length - customEngines.length) {
+        // 只为非 Google 引擎添加删除按钮
+        if (engine.name !== 'Google') {
+          const removeIcon = document.createElement('div');
+          removeIcon.className = 'remove-icon';
           engineItem.appendChild(removeIcon);
           
           removeIcon.addEventListener('click', (e) => {
             e.stopPropagation();
-            const confirmed = confirm("Are you sure you want to delete this custom search engine?");
+            const confirmed = confirm("Are you sure you want to delete this search engine?");
             if (confirmed) {
               const customIndex = index - (engines.length - customEngines.length);
               customEngines.splice(customIndex, 1);

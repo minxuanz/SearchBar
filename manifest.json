@@ -23,5 +23,6 @@
     "16": "ttt.png",
     "48": "ttt.png",
     "128": "ttt.png"
-  }
+  },
+  "options_page": "options.html"
 }
