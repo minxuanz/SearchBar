@@ -47,6 +47,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const engine = engines[currentEngineIndex];
       window.open(`${engine.url}${encodeURIComponent(query)}`, "_blank");
       searchBox.value = ""; // Clear the input
+    } 
+    // 添加上下键控制
+    else if (event.key === "ArrowUp") {
+      event.preventDefault(); // 防止光标移动到行首
+      currentEngineIndex = (currentEngineIndex - 1 + engines.length) % engines.length;
+      updateSearchEngine();
+    }
+    else if (event.key === "ArrowDown") {
+      event.preventDefault(); // 防止光标移动到行尾
+      currentEngineIndex = (currentEngineIndex + 1) % engines.length;
+      updateSearchEngine();
     }
   });
 
