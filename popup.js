@@ -1,17 +1,15 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const searchBox = document.getElementById("search-box");
   const searchIcon = document.getElementById("search-icon");
   const upIcon = document.getElementById("up-icon");
   const downIcon = document.getElementById("down-icon");
-  const addEngine = document.getElementById("add-icon");
-  const deleteIcon = document.getElementById("delete-icon");
+  const enginesDropdown = document.getElementById("engines-dropdown");
 
   let engines = [
-    { name: 'Google', url: 'https://www.google.com/search?q=', icon: 'icons/google.png' },
-    { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: 'icons/bing.png' },
-    { name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'icons/baidu.png' },
-    { name: 'Duckduckgo', url: 'https://www.duckduckgo.com/?q=', icon: 'icons/duckduckgo.png' },
+    { name: 'Google', url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
+    { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
+    { name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
+    { name: 'Duckduckgo', url: 'https://www.duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
   ];
 
   // Load current engine index from localStorage or default to 0
@@ -52,46 +50,134 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  addEngine.addEventListener('click', () => {
-    const customUrl = prompt("Enter the search URL (use {q} for query placeholder):", "https://github.com/search?q=");
-    if (customUrl) {
-      const customName = prompt("Enter a name for this search engine:", "Custom Engine");
-      const customIcon = prompt("Enter the icon URL for this search engine:", "icons/custom.png");
+  function createEnginesDropdown() {
+    enginesDropdown.innerHTML = '';
+    
+    // 添加引擎
+    engines.forEach((engine, index) => {
+      if (index !== currentEngineIndex) {
+        const engineItem = document.createElement('div');
+        engineItem.className = 'engine-item';
+        engineItem.title = engine.name;
+        
+        // 创建引擎图标
+        const engineIcon = document.createElement('img');
+        engineIcon.src = engine.icon;
+        engineIcon.alt = engine.name;
+        
+        // 创建删除按钮（仅对自定义引擎显示）
+        const removeIcon = document.createElement('div');
+        removeIcon.className = 'remove-icon';
+        
+        if (index >= engines.length - customEngines.length) {
+          engineItem.appendChild(removeIcon);
+          
+          removeIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const confirmed = confirm("Are you sure you want to delete this custom search engine?");
+            if (confirmed) {
+              const customIndex = index - (engines.length - customEngines.length);
+              customEngines.splice(customIndex, 1);
+              engines.splice(index, 1);
+              localStorage.setItem('customEngines', JSON.stringify(customEngines));
+              if (currentEngineIndex > index) {
+                currentEngineIndex--;
+              }
+              updateSearchEngine();
+              createEnginesDropdown();
+            }
+          });
+        }
+        
+        engineItem.appendChild(engineIcon);
+        
+        engineItem.addEventListener('click', () => {
+          currentEngineIndex = index;
+          updateSearchEngine();
+          toggleDropdown(false);
+        });
+        
+        enginesDropdown.appendChild(engineItem);
+      }
+    });
 
-      const newEngine = {
-        name: customName,
-        url: customUrl.replace("{q}", ""),
-        icon: customIcon,
-      };
+    // 添加分隔线
+    const separator = document.createElement('div');
+    separator.style.width = '1px';
+    separator.style.height = '20px';
+    separator.style.backgroundColor = '#dfe1e5';
+    separator.style.margin = '0 4px';
+    enginesDropdown.appendChild(separator);
 
-      engines.push(newEngine);
-      customEngines.push(newEngine);
-      localStorage.setItem('customEngines', JSON.stringify(customEngines));
-      currentEngineIndex = engines.length - 1;
-      updateSearchEngine();
-    }
-  });
+    // 添加"添加引擎"按钮
+    const addItem = document.createElement('div');
+    addItem.className = 'engine-item';
+    addItem.title = 'Add custom engine';
+    addItem.innerHTML = `
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E" class="add-icon">
+    `;
+    addItem.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown(false);
+      // 使用原来的添加引擎逻辑
+      const customUrl = prompt("Enter the search URL (use {q} for query placeholder):", "https://github.com/search?q=");
+      if (customUrl) {
+        const customName = prompt("Enter a name for this search engine:", "Custom Engine");
+        let customIcon;
+        try {
+          const url = new URL(customUrl);
+          customIcon = `https://www.google.com/s2/favicons?domain=${url.hostname}`;
+        } catch {
+          customIcon = 'https://www.google.com/s2/favicons?domain=google.com';
+        }
 
-  deleteIcon.addEventListener('click', () => {
-    // Check if the current engine is a custom engine
-    if (currentEngineIndex >= engines.length - customEngines.length) {
-      const confirmed = confirm("Are you sure you want to delete this custom search engine?");
-      if (confirmed) {
-        // Remove from engines and customEngines
-        const customIndex = currentEngineIndex - (engines.length - customEngines.length);
-        customEngines.splice(customIndex, 1);
-        engines.splice(currentEngineIndex, 1);
+        const newEngine = {
+          name: customName,
+          url: customUrl.replace("{q}", ""),
+          icon: customIcon,
+        };
 
-        // Save updated custom engines to localStorage
+        engines.push(newEngine);
+        customEngines.push(newEngine);
         localStorage.setItem('customEngines', JSON.stringify(customEngines));
-
-        // Update currentEngineIndex
-        currentEngineIndex = Math.min(currentEngineIndex, engines.length - 1);
+        currentEngineIndex = engines.length - 1;
         updateSearchEngine();
       }
+    });
+    enginesDropdown.appendChild(addItem);
+  }
+
+  function toggleDropdown(show) {
+    console.log('toggleDropdown called', show); // 添加调试日志
+    if (show === undefined) {
+      if (!enginesDropdown.classList.contains('show')) {
+        createEnginesDropdown(); // 在显示之前更新内容
+      }
+      enginesDropdown.classList.toggle('show');
     } else {
-      alert("Default search engines cannot be deleted.");
+      if (show) {
+        createEnginesDropdown();
+        enginesDropdown.classList.add('show');
+      } else {
+        enginesDropdown.classList.remove('show');
+      }
     }
+  }
+
+  // 修改搜索图标点击事件，确保事件监听器正确绑定
+  searchIcon.addEventListener('click', (event) => {
+    event.stopPropagation();
+    toggleDropdown();
+  });
+
+  // 确保下拉菜单的点击事件阻止冒泡
+  enginesDropdown.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  // 点击文档其他地方关闭菜单
+  document.addEventListener('click', () => {
+    toggleDropdown(false);
   });
 
   // Initialize
