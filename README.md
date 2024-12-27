@@ -12,9 +12,6 @@ A simple browser search extension that supports quick switching between multiple
 - Add custom search engines
 - Quick access with shortcut key (Ctrl+Shift+F)
 - Switch search engines using arrow keys or clicks
-- Clean and beautiful interface design
-- Delete custom search engines
-- Automatically fetch website icons as search engine icons
 
 ### Usage
 
@@ -62,9 +59,7 @@ A simple browser search extension that supports quick switching between multiple
 - 可以添加自定义搜索引擎
 - 快捷键快速唤起搜索栏（Ctrl+Shift+F）
 - 通过上下键或点击切换搜索引擎
-- 简洁美观的界面设计
-- 支持删除自定义搜索引擎
-- 自动获取网站图标作为搜索引擎图标
+
 
 ### 使用方法
 
