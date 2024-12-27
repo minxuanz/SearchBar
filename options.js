@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <img src="${engine.icon}" class="engine-icon" alt="${engine.name}">
         <span class="engine-name">${engine.name}</span>
         <button class="delete-btn" ${engine.name === 'Google' ? 'disabled' : ''}>
-          删除
+          Delete
         </button>
       `;
 

@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const customEngines = JSON.parse(localStorage.getItem('customEngines')) || [];
   engines = engines.concat(customEngines);
 
+  const ICONS_PER_PAGE = 7; // 每页显示的图标数量
+  let currentPage = 0; // 当前页码
+
   function updateSearchEngine() {
     const engine = engines[currentEngineIndex];
     searchIcon.src = engine.icon;
@@ -31,14 +34,34 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem('currentEngineIndex', currentEngineIndex);
   }
   
-  upIcon.addEventListener('click', () => {
-    currentEngineIndex = (currentEngineIndex - 1 + engines.length) % engines.length;
-    updateSearchEngine();
+  upIcon.addEventListener('click', (event) => {
+    if (event.shiftKey) {
+      // Shift + 上箭头切换到上一页
+      event.stopPropagation();
+      if (engines.length > ICONS_PER_PAGE) {
+        currentPage = (currentPage - 1 + Math.ceil((engines.length - 1) / ICONS_PER_PAGE)) % Math.ceil((engines.length - 1) / ICONS_PER_PAGE);
+        createEnginesDropdown();
+      }
+    } else {
+      // 原有的切换搜索引擎功能
+      currentEngineIndex = (currentEngineIndex - 1 + engines.length) % engines.length;
+      updateSearchEngine();
+    }
   });
 
-  downIcon.addEventListener('click', () => {
-    currentEngineIndex = (currentEngineIndex + 1) % engines.length;
-    updateSearchEngine();
+  downIcon.addEventListener('click', (event) => {
+    if (event.shiftKey) {
+      // Shift + 下箭头切换到下一页
+      event.stopPropagation();
+      if (engines.length > ICONS_PER_PAGE) {
+        currentPage = (currentPage + 1) % Math.ceil((engines.length - 1) / ICONS_PER_PAGE);
+        createEnginesDropdown();
+      }
+    } else {
+      // 原有的切换搜索引擎功能
+      currentEngineIndex = (currentEngineIndex + 1) % engines.length;
+      updateSearchEngine();
+    }
   });
 
   searchBox.addEventListener("keydown", (event) => {
@@ -64,52 +87,86 @@ document.addEventListener("DOMContentLoaded", () => {
   function createEnginesDropdown() {
     enginesDropdown.innerHTML = '';
     
+    // 计算总页数和当前页显示的引擎范围
+    const availableEngines = engines.filter((_, index) => index !== currentEngineIndex);
+    const totalPages = Math.ceil(availableEngines.length / ICONS_PER_PAGE);
+    
+    // 计算当前页应该显示的引擎范围
+    const startIndex = currentPage * ICONS_PER_PAGE;
+    const endIndex = Math.min(startIndex + ICONS_PER_PAGE, availableEngines.length);
+    
     // 添加引擎
-    engines.forEach((engine, index) => {
-      if (index !== currentEngineIndex) {
-        const engineItem = document.createElement('div');
-        engineItem.className = 'engine-item';
-        engineItem.title = engine.name;
+    availableEngines.slice(startIndex, endIndex).forEach((engine, pageIndex) => {
+      const index = engines.indexOf(engine);
+      const engineItem = document.createElement('div');
+      engineItem.className = 'engine-item';
+      engineItem.title = engine.name;
+      
+      // 创建引擎图标
+      const engineIcon = document.createElement('img');
+      engineIcon.src = engine.icon;
+      engineIcon.alt = engine.name;
+      
+      // 只为非默认引擎添加删除按钮
+      if (index >= 1) { // 前4个是默认引擎
+        const removeIcon = document.createElement('div');
+        removeIcon.className = 'remove-icon';
+        engineItem.appendChild(removeIcon);
         
-        // 创建引擎图标
-        const engineIcon = document.createElement('img');
-        engineIcon.src = engine.icon;
-        engineIcon.alt = engine.name;
-        
-        // 只为非 Google 引擎添加删除按钮
-        if (engine.name !== 'Google') {
-          const removeIcon = document.createElement('div');
-          removeIcon.className = 'remove-icon';
-          engineItem.appendChild(removeIcon);
-          
-          removeIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const confirmed = confirm("Are you sure you want to delete this search engine?");
-            if (confirmed) {
-              const customIndex = index - (engines.length - customEngines.length);
-              customEngines.splice(customIndex, 1);
-              engines.splice(index, 1);
-              localStorage.setItem('customEngines', JSON.stringify(customEngines));
-              if (currentEngineIndex > index) {
-                currentEngineIndex--;
-              }
-              updateSearchEngine();
-              createEnginesDropdown();
+        removeIcon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const confirmed = confirm("Are you sure you want to delete this search engine?");
+          if (confirmed) {
+            const customIndex = index - (engines.length - customEngines.length);
+            customEngines.splice(customIndex, 1);
+            engines.splice(index, 1);
+            localStorage.setItem('customEngines', JSON.stringify(customEngines));
+            if (currentEngineIndex > index) {
+              currentEngineIndex--;
             }
-          });
-        }
-        
-        engineItem.appendChild(engineIcon);
-        
-        engineItem.addEventListener('click', () => {
-          currentEngineIndex = index;
-          updateSearchEngine();
-          toggleDropdown(false);
+            updateSearchEngine();
+            createEnginesDropdown();
+          }
         });
-        
-        enginesDropdown.appendChild(engineItem);
       }
+      
+      engineItem.appendChild(engineIcon);
+      
+      engineItem.addEventListener('click', () => {
+        currentEngineIndex = index;
+        updateSearchEngine();
+        toggleDropdown(false);
+      });
+      
+      enginesDropdown.appendChild(engineItem);
     });
+
+    // 如果有多页，添加页码指示器和翻页按钮
+    if (totalPages > 1) {
+      const pageControls = document.createElement('div');
+      pageControls.className = 'page-controls';
+      
+      const pageIndicator = document.createElement('div');
+      pageIndicator.className = 'page-indicator';
+      pageIndicator.textContent = `${currentPage + 1}/${totalPages}`;
+      
+      const pageDownIcon = document.createElement('div');
+      pageDownIcon.className = 'page-down-icon';
+      pageDownIcon.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
+        </svg>
+      `;
+      pageDownIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentPage = (currentPage + 1) % totalPages;
+        createEnginesDropdown();
+      });
+      
+      pageControls.appendChild(pageIndicator);
+      pageControls.appendChild(pageDownIcon);
+      enginesDropdown.appendChild(pageControls);
+    }
 
     // 添加分隔线
     const separator = document.createElement('div');
@@ -185,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
     event.stopPropagation();
   });
 
-  // 点击文档其他地方关闭菜单
+  // 点击���档其他地方关闭菜单
   document.addEventListener('click', () => {
     toggleDropdown(false);
   });
