@@ -186,8 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addItem.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleDropdown(false);
-      // 使用原来的添加引擎逻辑
-      const customUrl = prompt("Enter the search URL (use {q} for query placeholder):", "https://github.com/search?q=");
+      // 修改提示文本，将 {q} 改为 %s
+      const customUrl = prompt("Enter the search URL (use %s for query placeholder):", "https://github.com/search?q=%s");
       if (customUrl) {
         const customName = prompt("Enter a name for this search engine:", "Custom Engine");
         let customIcon;
@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const newEngine = {
           name: customName,
-          url: customUrl.replace("{q}", ""),
+          url: customUrl.replace("%s", ""),
           icon: customIcon,
         };
 
