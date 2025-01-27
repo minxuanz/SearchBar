@@ -1,6 +1,6 @@
 # Simple Search Bar <img src="ttt.png" width="24" height="24" style="vertical-align: middle;">
 
-[English](#english) | [中文](#chinese)
+[English](#english)
 
 <h2 id="english">English</h2>
 
