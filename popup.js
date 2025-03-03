@@ -107,8 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
       engineIcon.src = engine.icon;
       engineIcon.alt = engine.name;
       
-      // 只为非默认引擎添加删除按钮
-      if (index >= 1) { // 前4个是默认引擎
+      // 只为自定义引擎添加删除按钮（index >= 4，因为前4个是默认引擎）
+      if (index >= 4) {
         const removeIcon = document.createElement('div');
         removeIcon.className = 'remove-icon';
         engineItem.appendChild(removeIcon);
@@ -186,29 +186,47 @@ document.addEventListener("DOMContentLoaded", () => {
     addItem.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleDropdown(false);
-      // 修改提示文本，将 {q} 改为 %s
       const customUrl = prompt("Enter the search URL (use %s for query placeholder):", "https://github.com/search?q=%s");
       if (customUrl) {
-        const customName = prompt("Enter a name for this search engine:", "Custom Engine");
-        let customIcon;
-        try {
-          const url = new URL(customUrl);
-          customIcon = `https://www.google.com/s2/favicons?domain=${url.hostname}`;
-        } catch {
-          customIcon = 'https://www.google.com/s2/favicons?domain=google.com';
+        // 验证 URL 格式和查询占位符
+        if (!customUrl.includes('%s')) {
+          alert('Error: URL must contain %s as the query placeholder');
+          return;
         }
 
-        const newEngine = {
-          name: customName,
-          url: customUrl.replace("%s", ""),
-          icon: customIcon,
-        };
+        try {
+          // 测试替换占位符后的 URL 是否有效
+          const testUrl = new URL(customUrl.replace('%s', 'test'));
+          
+          const customName = prompt("Enter a name for this search engine:", "Custom Engine");
+          if (!customName || customName.trim() === '') {
+            alert('Error: Engine name cannot be empty');
+            return;
+          }
 
-        engines.push(newEngine);
-        customEngines.push(newEngine);
-        localStorage.setItem('customEngines', JSON.stringify(customEngines));
-        currentEngineIndex = engines.length - 1;
-        updateSearchEngine();
+          let customIcon;
+          try {
+            const url = new URL(customUrl);
+            customIcon = `https://icons.duckduckgo.com/ip3/${url.hostname}.ico`;
+          } catch {
+            customIcon = `https://icons.duckduckgo.com/ip3/google.com.ico`;
+          }
+
+          const newEngine = {
+            name: customName.trim(),
+            url: customUrl.replace("%s", ""),
+            icon: customIcon,
+          };
+
+          engines.push(newEngine);
+          customEngines.push(newEngine);
+          localStorage.setItem('customEngines', JSON.stringify(customEngines));
+          currentEngineIndex = engines.length - 1;
+          updateSearchEngine();
+        } catch (error) {
+          alert('Error: Please enter a valid URL');
+          return;
+        }
       }
     });
     enginesDropdown.appendChild(addItem);
@@ -242,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
     event.stopPropagation();
   });
 
-  // 点击���档其他地方关闭菜单
+
   document.addEventListener('click', () => {
     toggleDropdown(false);
   });
